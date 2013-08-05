@@ -33,7 +33,8 @@ var Player = function(socket) {
 		health : 100,
 		level: 1,
 		experience: 0,
-		'class': ''
+		'class': '',
+		race: 'human'
 	};
 
 	// Anything affecting the player
@@ -167,7 +168,8 @@ var Player = function(socket) {
 	 */
 	self.notCombatUsable = function (name)
 	{
-		var skill = Skills[self.getAttribute("class")][name];
+		//var skill = Skills[self.getAttribute("class")][name];
+		var skill = self.findSkill(name);
         return skill.notCombatUsable;
 	};
 
@@ -178,7 +180,8 @@ var Player = function(socket) {
 	 */
 	self.getCooldown = function (name)
 	{
-		var skill = Skills[self.getAttribute("class")][name];
+		//var skill = Skills[self.getAttribute("class")][name] || Skills[self.getAttribute("race")][name];
+		var skill = self.findSkill(name);
 		if (self.getAffects('cooldown_'+name)) {
 			if (skill.onCooldown) {
 				skill.onCooldown(self);
@@ -197,7 +200,8 @@ var Player = function(socket) {
 	 */
 	self.setCooldown = function (name)
 	{
-		var skill = Skills[self.getAttribute("class")][name];
+		//var skill = Skills[self.getAttribute("class")][name] || Skills[self.getAttribute("race")][name];
+		var skill = self.findSkill(name);
 		if (skill.cooldown){
 			self.addAffect('cooldown_'+name, {
 				duration: skill.cooldown,
@@ -462,7 +466,8 @@ var Player = function(socket) {
 		self.skills     = data.skills;
 		// Activate any passive skills the player has
 		for (var skill in self.skills) {
-			if (Skills[self.getAttribute('class')][skill].type === 'passive') {
+			//if (Skills[self.getAttribute('class')][skill].type === 'passive') {
+			if (self.findSkill(skill).type === 'passive') {
 				self.useSkill(skill, self);
 			}
 		}
@@ -547,6 +552,19 @@ var Player = function(socket) {
 	 * Helper to activate skills
 	 * @param string skill
 	 */
+	self.findSkill = function (skill)
+	{
+        var test = function(group,skill){
+        	var group = self.getAttribute(group);
+        	return Skills[group] ? Skills[group][skill] : false;
+        }
+        return test('class',skill) || test('race',skill) || test('pGroup',skill);
+	};
+
+	/**
+	 * Helper to activate skills
+	 * @param string skill
+	 */
 	self.useSkill = function (skill/*, args... */)
 	{
 		if (self.isInCombat()){
@@ -556,7 +574,11 @@ var Player = function(socket) {
 
         if (self.getCooldown(skill)) return true;
 
-		Skills[self.getAttribute('class')][skill].activate.apply(null, [].slice.call(arguments).slice(1));
+        var foundSkill = self.findSkill(skill);
+
+        var l10n = foundSkill.l10n || null;
+
+		foundSkill.activate.apply(null, [l10n].concat([].slice.call(arguments).slice(1)));
 
         self.setCooldown(skill);
 	};

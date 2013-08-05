@@ -45,31 +45,42 @@ exports.listeners = {
 		return function ()
 		{
 			var newlevel = this.getAttribute('level') + 1;
-			var health_gain = Math.ceil(this.getAttribute('max_health') * 1.10);
+			//var health_gain = Math.ceil(this.getAttribute('max_health') * 1.10);
+			var cl = this.getAttribute('class');
+			var race = this.getAttribute('race');
+			var clhp = require('./../../classes/'+cl+'.js').attributes.hp;
+			var racehp = require('./../../races/'+race+'.js').attributes.hp;
+			var hprange = clhp.split('-').map(function (i) { return parseInt(i, 10); });
+			var health_gain = hprange[0] + Math.max(0, Math.floor(Math.random() * (hprange[1] - hprange[0])));
+			health_gain += racehp;
 
-			this.sayL10n(l10n, 'LEVELUP', newlevel, health_gain - this.getAttribute('max_health'));
+			this.sayL10n(l10n, 'LEVELUP', newlevel, health_gain);
 			this.setAttribute('level', newlevel);
 			this.setAttribute('experience', 0);
 
 			// do whatever you want to do here when a player levels up...
-			this.setAttribute('max_health', health_gain);
+			this.setAttribute('max_health', this.getAttribute('max_health') + health_gain);
 			this.setAttribute('health', this.getAttribute('max_health'));
 
 			// Assign any new skills
-			var skills = Skills[this.getAttribute('class')];
-			for (var sk in skills) {
-				var skill = skills[sk];
-				if (skill.level === this.getAttribute('level')) {
-					this.addSkill(sk, {
-						type: skill.type
-					});
-					this.sayL10n(l10n, 'NEWSKILL', skill.name);
+			var assign = function(skills,self){
+				for (var sk in skills) {
+					var skill = skills[sk];
+					if (skill.level === self.getAttribute('level')) {
+						self.addSkill(sk, {
+							type: skill.type
+						});
+						self.sayL10n(l10n, 'NEWSKILL', skill.name);
 
-					if (skill.type === 'passive') {
-						this.useSkill(sk, this);
+						if (skill.type === 'passive') {
+							self.useSkill(sk, self);
+						}
 					}
 				}
-			}
+			};
+			assign(Skills[this.getAttribute('class')],this);
+			assign(Skills[this.getAttribute('race')],this);
+
 		}
 	},
 	die: function (l10n)

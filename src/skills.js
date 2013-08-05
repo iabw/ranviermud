@@ -14,8 +14,27 @@ var L = function (locale, cls, key /*, args... */)
 	return l10n.translate.apply(null, [].slice.call(arguments).slice(2));
 };
 
-exports.Skills = {
-	thief: require('./../classes/thief.js').skills,
+
+
+
+var config = {
+	classes: ["thief","warrior"],
+	races: ["human"]
+};
+exports.Skills = function(){
+	var obj = {};
+	for (var key in config){
+		var group = config[key];
+		for (var i=0; i<group.length; i++){
+			var item = group[i];
+			console.log("./../"+key+"/"+item+".js");
+			obj[item] = require("./../"+key+"/"+item+".js").skills;
+		}
+	}
+	return obj;
+}();
+/*exports.Skills = {
+	//thief: require('./../classes/thief.js').skills,
 	warrior: {
 		tackle: {
 			type: 'active',
@@ -87,4 +106,4 @@ exports.Skills = {
 			}
 		}
 	}
-};
+};*/

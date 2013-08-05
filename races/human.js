@@ -1,10 +1,11 @@
 var Affects  = require('./../src/affects.js').Affects;
 
-var cl10n = require('../src/l10n')(__dirname + '/../l10n/skills/thief.yml')
-var pl10n = require('../src/l10n')(__dirname + '/../l10n/scripts/player/player.js.yml')
+reql10n = require('../src/l10n');
+var rl10n = reql10n(__dirname + '/../l10n/races/human.yml')
+var pl10n = reql10n(__dirname + '/../l10n/scripts/player/player.js.yml')
 
 exports.attributes = {
-    hp: '14-25'
+    hp: 3
 };
 
 exports.skills = {
@@ -19,11 +20,11 @@ exports.skills = {
             player.sayL10n(this.l10n, 'HIDE_COMBAT');
         },
         offCooldown: function(player){
-            player.sayL10n(pl10n, 'COOLDOWN_END', "Test Replacement String");
+            //player.sayL10n(pl10n, 'COOLDOWN_END', "Test Replacement String");
         },
         activate: function(l10n, player, args, rooms, npcs, players)
         {
-            var l10n = l10n || cl10n;
+            var l10n = l10n || rl10n;
             player.addAffect("hidden", Affects.hidden({
                 duration: 10,
                 magnitude: 1.5,
