@@ -199,8 +199,10 @@ var Events = {
 				Commands.player_commands.look(null, player);
 				player.prompt();
 
-				// All that shit done, let them play!
-				player.getSocket().emit("commands", player);
+				if (!player.getAffects("frozen")){
+					// All that shit done, let them play!
+					player.getSocket().emit("commands", player);
+				}
 				break;
 			};
 		},
@@ -211,6 +213,7 @@ var Events = {
 		 */
 		commands : function(player)
 		{
+			var l10n = require('./l10n')(__dirname + '/../l10n/commands.yml');
 			// Parse order is commands -> exits -> skills -> channels
 			player.getSocket().once('data', function (data)
 			{
@@ -246,10 +249,16 @@ var Events = {
 							if (exit === false) {
 								if (!(command in player.getSkills())) {
 									if (!(command in Channels)) {
-										player.say(command + " is not a valid command.");
+										//player.say(command + " is not a valid command.");
+										player.sayL10n(l10n,"INVALID_COMMAND",command);
 										result = true;
 									} else {
-										Channels[command].use(args, player, players);
+										if (!player.getAffects("silenced")){
+											Channels[command].use(args, player, players);
+										}
+										else {
+											player.sayL10n(l10n,"SILENCED");
+										}
 									}
 								} else {
 									result = player.useSkill(command, player, args, rooms, npcs, players);

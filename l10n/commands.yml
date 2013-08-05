@@ -11,3 +11,12 @@ MOVE_COMBAT:
     en: "Where do you think you're going in the middle of a fight?"
     es: "ES-Where do you think you're going in the middle of a fight?"
 # vim: set ts=4 sw=4 et :
+SILENCED:
+    en: "You are silenced!"
+    es: "ES-You are silenced!"
+FROZEN:
+    en: "You are frozen!"
+    es: "ES-You are frozen!"
+INVALID_COMMAND:
+    en: "$[1] is not a valid command."
+    es: "ES-$[1] is not a valid command."

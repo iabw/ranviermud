@@ -118,9 +118,10 @@ var Player = function(socket) {
 	};
 
 	/**
-	 * Can a player see a target move?
-	 * @param object item/player/mob
-	 * @return boolean
+	 * Gets the current movement method of the player
+	 * TODO: Add water rooms that swim you upon entering if not flying
+	 * //@param object item/player/mob
+	 * @return string
 	 */
 	self.getMoveMode = function (target) {
 		if (self.getAffects("fly")) {
@@ -485,7 +486,7 @@ var Player = function(socket) {
 	 */
 	self.getAttackSpeed = function ()
 	{
-		var weapon = self.getEquipped('wield', true)
+		var weapon = self.getEquipped('wield', true);
 		return weapon ? (weapon.getAttribute('speed') || 1) : 1;
 	};
 
@@ -495,7 +496,7 @@ var Player = function(socket) {
 	 */
 	self.getDamage = function ()
 	{
-		var weapon = self.getEquipped('wield', true)
+		var weapon = self.getEquipped('wield', true);
 		var base = [1, 20];
 		var damage = weapon ?
 			(weapon.getAttribute('damage') ?
